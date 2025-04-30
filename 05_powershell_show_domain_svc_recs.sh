@@ -6,7 +6,7 @@
 
 # Script to fetch the required Microsoft 365 service configuration DNS records for a domain.
 # Usage: ./05_powershell_show_domain_svc_recs.sh yourdomain.com
-# Output: Writes JSON string containing the required DNS records to 05.output.powershell.ouput.txt
+# Output: Writes JSON string containing the required DNS records to 05.output.powershell.output.txt
 
 set -e # Exit immediately if a command exits with a non-zero status.
 # set -o pipefail # Ensures that pipeline errors are caught
@@ -17,7 +17,7 @@ if [ -z "$1" ]; then
     exit 1
 fi
 DOMAIN_NAME="$1"
-OUTPUT_FILE="05.output.powershell.ouput.txt"
+OUTPUT_FILE="05.output.powershell.output.txt"
 
 echo "Attempting to fetch M365 service configuration records for domain: $DOMAIN_NAME" >&2
 
