@@ -5,7 +5,7 @@
 # SPDX-License-Identifier: MIT
 
 # Script to add a custom domain using interactive login.
-# Usage: ./03_powershell_add_custom_domain.sh yourdomain.com
+# Usage: ./03_powershell_add_domain.sh yourdomain.com
 set -e
 
 # Check for domain name argument
@@ -21,9 +21,8 @@ TEMP_OUTPUT_FILE="03.output.powershell.output.txt"
 # Add cleanup: Move existing temp/output files to Trash if they exist
 # Use -f with mv to suppress errors if files don't exist (though macOS mv doesn't have -f, it doesn't error)
 echo "Checking for and moving old temporary files to Trash..."
-mv "$TEMP_SCRIPT_FILE" ~/.Trash/ 2>/dev/null || true
-mv "$TEMP_OUTPUT_FILE" ~/.Trash/ 2>/dev/null || true
-echo "Cleanup check complete."
+[ -f "$TEMP_SCRIPT_FILE" ] && mv -v "$TEMP_SCRIPT_FILE" ~/.Trash/
+[ -f "$TEMP_OUTPUT_FILE" ] && mv -v "$TEMP_OUTPUT_FILE" ~/.Trash/
 
 # Create the temporary PowerShell script
 # Modify the PowerShell script to output JSON with TTL
@@ -32,7 +31,7 @@ param(
     [string]\$DomainNameArg
 )
 
-Write-Host ("PowerShell script started for domain: " + \$DomainNameArg) -ForegroundColor Green -ErrorAction SilentlyContinue
+Write-Host ("PowerShell script started for domain: " + \$DomainNameArg) -ForegroundColor Green -ErrorAction Continue
 
 \$ErrorActionPreference = 'Stop' # Stop on errors to handle them
 
@@ -43,11 +42,11 @@ try {
     # Use device code authentication for interactive login
     Connect-MgGraph -Scopes 'Directory.AccessAsUser.All','Domain.ReadWrite.All'
 
-    Write-Host ("Attempting to add domain: " + \$DomainNameArg) -ForegroundColor Cyan -ErrorAction SilentlyContinue
+    Write-Host ("Attempting to add domain: " + \$DomainNameArg) -ForegroundColor Cyan -ErrorAction Continue
     # Suppress output from New-MgDomain, handle potential errors below
-    New-MgDomain -Id \$DomainNameArg -ErrorAction SilentlyContinue | Out-Null
+    New-MgDomain -Id \$DomainNameArg -ErrorAction Continue | Out-Null
 
-    Write-Host ("Attempting to get verification records for: " + \$DomainNameArg) -ForegroundColor Cyan -ErrorAction SilentlyContinue
+    Write-Host ("Attempting to get verification records for: " + \$DomainNameArg) -ForegroundColor Cyan -ErrorAction Continue
     # Capture the verification record object
     \$verificationRecord = Get-MgDomainVerificationDnsRecord -DomainId \$DomainNameArg -ErrorAction Stop
 
@@ -95,7 +94,7 @@ try {
     exit 1
 }
 
-Write-Host ("PowerShell script finished for domain: " + \$DomainNameArg) -ForegroundColor Green -ErrorAction SilentlyContinue
+Write-Host ("PowerShell script finished for domain: " + \$DomainNameArg) -ForegroundColor Green -ErrorAction Continue
 EOF
 
 # Execute the temporary PowerShell script, passing the domain name
